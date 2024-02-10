@@ -44,7 +44,7 @@ func main() {
 	close(pageChan)
 
 	// Запуск горутин для обработки каждой страницы
-	for i := 0; i < 10; i++ { // Запускаем 10 горутин для параллельной обработки страниц
+	for i := 0; i < 50; i++ { // Запускаем 50 горутин для параллельной обработки страниц ОСТОРОЖНО, НАГРУЖАЕТ НОРМАЛЬНО ТАК!!!
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -66,7 +66,6 @@ func main() {
 	// Получение результатов из горутин и добавление в общий список продуктов
 	for products := range resultChan {
 		for _, p := range products {
-			log.Printf("Received product: %s, Price: %s, URL: %s\n", p.Name, p.Price, "https://poizonshop.ru"+p.Url)
 			writer.Write([]string{"https://poizonshop.ru" + p.Url, p.Name, p.Price})
 		}
 	}
@@ -75,10 +74,8 @@ func main() {
 // Функция для получения данных о продуктах с одной страницы
 func getProducts(ctx context.Context, page int) []Product {
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", true),
-		chromedp.WindowSize(1280, 1080),
-		chromedp.UserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"),
 		chromedp.Flag("blink-settings", "scriptEnabled=false"),
+		chromedp.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"),
 	)
 
 	ctx, cancel := chromedp.NewExecAllocator(ctx, opts...)
